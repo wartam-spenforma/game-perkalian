@@ -68,6 +68,77 @@
     }
     #btn-mulai { background: linear-gradient(135deg, #28a87c 0%, #1e7a5c 100%); }
     #btn-daftar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    #btn-peserta { background: linear-gradient(135deg, #ff9800 0%, #e65100 100%); }
+
+    /* ===== View: Lihat Peserta ===== */
+    #view-peserta.active {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+    #peserta-card {
+        background: white;
+        border-radius: 20px;
+        padding: 35px;
+        max-width: 480px;
+        width: 100%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    #peserta-card h2 {
+        color: #333;
+        font-size: 22px;
+        margin-bottom: 5px;
+    }
+    #peserta-card p.sub {
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+    #peserta-reload-btn {
+        background: #ff9800;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 18px;
+    }
+    #peserta-reload-btn:hover { background: #f57c00; }
+    #peserta-status {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 12px;
+    }
+    #peserta-table-wrap {
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+        border-radius: 10px;
+    }
+    #peserta-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 14px;
+    }
+    #peserta-table th {
+        background: #f5f5f5;
+        padding: 10px 12px;
+        position: sticky;
+        top: 0;
+        color: #555;
+        font-size: 13px;
+    }
+    #peserta-table td {
+        padding: 9px 12px;
+        border-top: 1px solid #f0f0f0;
+        color: #333;
+    }
+    #peserta-table tr:nth-child(even) td {
+        background: #fafafa;
+    }
 
     /* Tombol kembali dipakai di view game & form */
     .back-btn {
@@ -759,6 +830,7 @@
             <p class="sub">Pilih menu MULAI, jika nama tidak ada silakan buka menu DAFTAR</p>
             <button id="btn-mulai" class="menu-btn" onclick="goToView('game')">MULAI</button>
             <button id="btn-daftar" class="menu-btn" onclick="goToView('form')">DAFTAR</button>
+            <button id="btn-peserta" class="menu-btn" onclick="goToView('peserta')">LIHAT PESERTA</button>
         </div>
     </div>
 
@@ -911,11 +983,63 @@
     </div>
     </div>
 
+    <div id="view-peserta" class="app-view">
+        <div id="peserta-card">
+            <button class="back-btn" onclick="goToView('landing')">&larr; Kembali</button>
+            <h2>Daftar Peserta</h2>
+            <p class="sub">Data nama & sekolah dari Google Sheet</p>
+            <button id="peserta-reload-btn" onclick="loadPesertaList()">&#8635; Muat Ulang</button>
+            <p id="peserta-status">Memuat data...</p>
+            <div id="peserta-table-wrap">
+                <table id="peserta-table">
+                    <thead>
+                        <tr><th>No</th><th>Nama</th><th>Sekolah</th></tr>
+                    </thead>
+                    <tbody id="peserta-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 <script>
 function goToView(name) {
     document.querySelectorAll('.app-view').forEach(el => el.classList.remove('active'));
     document.getElementById('view-' + name).classList.add('active');
     document.body.classList.toggle('mode-game', name === 'game');
+    if (name === 'peserta') {
+        loadPesertaList();
+    }
+}
+
+function loadPesertaList() {
+    const statusEl = document.getElementById('peserta-status');
+    const tbody = document.getElementById('peserta-table-body');
+    statusEl.textContent = 'Memuat data...';
+    tbody.innerHTML = '';
+
+    // Menggunakan fungsi getParticipantList() dari Apps Script
+    // (memerlukan penambahan fungsi ini di kode GAS, lihat file terpisah)
+    jsonpRequest('getParticipantList', {})
+        .then(data => {
+            if (!data || data.length === 0) {
+                statusEl.textContent = 'Belum ada data peserta.';
+                return;
+            }
+            statusEl.textContent = 'Total: ' + data.length + ' peserta';
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                const name = (row[0] || '').toString();
+                const school = (row[1] || '').toString();
+                tr.innerHTML = '<td>' + (index + 1) + '</td><td></td><td></td>';
+                tr.children[1].textContent = name;
+                tr.children[2].textContent = school;
+                tbody.appendChild(tr);
+            });
+        })
+        .catch(error => {
+            console.error('Gagal memuat daftar peserta:', error);
+            statusEl.textContent = 'Gagal memuat data: ' + error.message;
+        });
 }
 </script>
 
@@ -926,7 +1050,7 @@ function goToView(name) {
         // [PENTING] URL Web App Google Apps Script
         // GANTI DENGAN URL WEB APP ANDA SETELAH DEPLOY
         // ================================================================
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwTM1HwJgXOGnoHFKTDaFMfS_c464By5jNMNv-kErKQFH6tDeHBU4WO3IoyoFCo2FNfog/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwN3Jos6wQLEYUixk69U8h5IG-cLoqk0aSCoJwZXVKiKgArUcUXwTcgqHjkyZm0y30Djg/exec';
 
         // ================================================================
         // FUNGSI JSONP - Cara paling reliable untuk mengatasi CORS
