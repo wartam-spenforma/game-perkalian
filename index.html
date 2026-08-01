@@ -1193,7 +1193,7 @@
             <button class="back-btn" onclick="goToView('landing')">&larr; Kembali</button>
             <h2>Daftar Peserta</h2>
             <p class="sub">Data nama & sekolah dari Google Sheet</p>
-            <button id="peserta-reload-btn" onclick="loadPesertaList()">&#8635; Muat Ulang</button>
+            <button id="peserta-reload-btn" onclick="loadPesertaList(true)">&#8635; Muat Ulang</button>
             <p id="peserta-status">Memuat data...</p>
             <div id="peserta-table-wrap">
                 <table id="peserta-table">
@@ -1229,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', function () {
     showPetunjuk();
 });
 
-function loadPesertaList() {
+function loadPesertaList(force) {
     const statusEl = document.getElementById('peserta-status');
     const tbody = document.getElementById('peserta-table-body');
     statusEl.textContent = 'Memuat data...';
@@ -1237,7 +1237,7 @@ function loadPesertaList() {
 
     // Menggunakan fungsi getParticipantList() dari Apps Script
     // (memerlukan penambahan fungsi ini di kode GAS, lihat file terpisah)
-    jsonpRequest('getParticipantList', {})
+    jsonpRequest('getParticipantList', { force: !!force })
         .then(data => {
             if (!data || data.length === 0) {
                 statusEl.textContent = 'Belum ada data peserta.';
@@ -1268,7 +1268,7 @@ function loadPesertaList() {
         // [PENTING] URL Web App Google Apps Script
         // GANTI DENGAN URL WEB APP ANDA SETELAH DEPLOY
         // ================================================================
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwN3Jos6wQLEYUixk69U8h5IG-cLoqk0aSCoJwZXVKiKgArUcUXwTcgqHjkyZm0y30Djg/exec';
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwGMniM5M2yyY-kGUbGvnO6p1Tz0gC629bpVh9htuzvw-AwSIWs1MBbKyTBpMRcH6RC_A/exec';
 
         // ================================================================
         // FUNGSI JSONP - Cara paling reliable untuk mengatasi CORS
@@ -1697,7 +1697,9 @@ function loadPesertaList() {
             currentQuestion.num2 = selectedPair[1];
 
             number1Display.textContent = currentQuestion.num1;
-            number2Display.textContent = currentQuestion.num2;
+            number2Display.textContent = currentQuestion.num2 < 0
+                ? '(' + currentQuestion.num2 + ')'
+                : currentQuestion.num2;
             playerAnswerInput.value = '';
             showFeedback('', true);
             focusAnswerInput();
