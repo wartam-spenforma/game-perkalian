@@ -1031,7 +1031,7 @@
                 <li>Jika baru menggunakan aplikasi, silakan klik menu <b>DAFTAR</b></li>
                 <li>Setelah data dikirim, tunggu beberapa saat</li>
                 <li>Selanjutnya cek di menu <b>PESERTA</b>, pastikan nama sudah tercantum</li>
-                <li>Anda boleh memulai dengan menekan tombol <b>MULAI</b> jika nama Anda memang sudah tercantum</li>
+                <li>Anda boleh memulai dengan menekan tombol <b>MULAI</b> jika nama Anda memang sudah tercantum (akan membutuhkan waktu maksimal 15 detik dan jangan lupa untuk merefresh halaman jika nama belum muncul)</li>
                 <li>Jika di lain waktu Anda membuka kembali aplikasi ini, Anda bisa langsung menekan tombol <b>MULAI</b></li>
             </ol>
             <p id="petunjuk-note">Catatan: koneksi internet sangat berpengaruh.</p>
@@ -1959,10 +1959,9 @@ function loadPesertaList(force) {
         // Sheet name: nama
         // Kolom A: Nama, Kolom B: Sekolah
         
-        // URL Web App (Ganti dengan URL deploy Web App Anda)
-        // Untuk menggunakan script ini, Anda perlu membuat Web App di Google Apps Script
-        // dan mengganti URL di bawah ini dengan URL Web App Anda
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzwWxf-oM2lF-4qmA_xVeyVAAL02hDHeAyUtILwM2P7FkXMjTGDTf5IOo60hjfZX7kYyg/exec"; // Ganti dengan URL Anda
+        // URL Web App -- SEKARANG SAMA dengan WEB_APP_URL (satu proyek Apps Script
+        // untuk quiz & pendaftaran, tidak lagi pakai proyek/URL terpisah)
+        const GOOGLE_SCRIPT_URL = WEB_APP_URL;
 
         // Jika belum memiliki Web App, gunakan mode simulasi untuk testing
         const USE_SIMULATION = false; // Set ke false jika sudah memiliki Web App
